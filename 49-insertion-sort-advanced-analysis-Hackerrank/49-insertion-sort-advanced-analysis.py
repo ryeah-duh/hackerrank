@@ -5,7 +5,6 @@ import os
 import random
 import re
 import sys
-from bisect import bisect_right
 
 
 #
@@ -16,20 +15,48 @@ from bisect import bisect_right
 #
 
 def insertionSort(arr):
-    sorted_arr = []
-    shifts = 0
+    temp = [0] * len(arr)
 
-    for i, value in enumerate(arr):
-        # Position where value should be inserted
-        position = bisect_right(sorted_arr, value)
+    def merge_sort(left, right):
+        if left >= right:
+            return 0
 
-        # Elements after position must shift right
-        shifts += i - position
+        mid = (left + right) // 2
 
-        # Insert value while maintaining sorted_arr in sorted order
-        sorted_arr.insert(position, value)
+        shifts = merge_sort(left, mid)
+        shifts += merge_sort(mid + 1, right)
 
-    return shifts
+        i = left
+        j = mid + 1
+        k = left
+
+        while i <= mid and j <= right:
+            if arr[i] <= arr[j]:
+                temp[k] = arr[i]
+                i += 1
+            else:
+                temp[k] = arr[j]
+                shifts += mid - i + 1
+                j += 1
+
+            k += 1
+
+        while i <= mid:
+            temp[k] = arr[i]
+            i += 1
+            k += 1
+
+        while j <= right:
+            temp[k] = arr[j]
+            j += 1
+            k += 1
+
+        for index in range(left, right + 1):
+            arr[index] = temp[index]
+
+        return shifts
+
+    return merge_sort(0, len(arr) - 1)
 
 
 if __name__ == '__main__':
